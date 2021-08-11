@@ -1,0 +1,13 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZTREINAMENTO_ALV012_SRC
+*&---------------------------------------------------------------------*
+
+SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME TITLE TEXT-S01.
+
+SELECT-OPTIONS: S_CPF   FOR ZTREINAMENTO_05-CPF       MATCHCODE OBJECT ZTREINAMENTO_SH03,
+                S_TRAB  FOR ZTREINAMENTO_05-TRABALHO  MATCHCODE OBJECT ZTREINAMENTO_SH04,
+                S_IDADE FOR ZTREINAMENTO_04-IDADE.
+
+SELECTION-SCREEN SKIP 1.
+
+SELECTION-SCREEN END OF BLOCK B1.
