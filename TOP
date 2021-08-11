@@ -1,0 +1,170 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZTREINAMENTO_ALV012_TOP
+*&---------------------------------------------------------------------*
+REPORT ZTREINAMENTO_ALV012 MESSAGE-ID ZTREINAMENTO.
+
+*&---------------------------------------------------------------------*
+*& Tables
+*&---------------------------------------------------------------------*
+TABLES: ZTREINAMENTO_04, ZTREINAMENTO_05.
+
+*&---------------------------------------------------------------------*
+*& Global Tables
+*&---------------------------------------------------------------------*
+DATA: GT_SAIDA TYPE TABLE OF ZTREINAMENTO_06.
+
+*&---------------------------------------------------------------------*
+*& Classes
+*&---------------------------------------------------------------------*
+CLASS: LCL_ALV                 DEFINITION DEFERRED,
+       LCL_EVENT_RECEIVER      DEFINITION DEFERRED,
+       LCL_ZTREINAMENTO_ALV012 DEFINITION DEFERRED.
+
+*&---------------------------------------------------------------------*
+*& Global references
+*&---------------------------------------------------------------------*
+DATA: GR_ALV                 TYPE REF TO LCL_ALV,
+      EVENT_RECEIVER         TYPE REF TO LCL_EVENT_RECEIVER,
+      GR_ZTREINAMENTO_ALV012 TYPE REF TO LCL_ZTREINAMENTO_ALV012.
+
+*&---------------------------------------------------------------------*
+*& Vari�veis do alv
+*&---------------------------------------------------------------------*
+DATA: G_GRID             TYPE REF TO CL_GUI_ALV_GRID,
+      G_CUSTOM_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER.
+
+DATA: GT_ROWS TYPE LVC_T_ROW,
+      GT_SORT TYPE LVC_T_SORT.
+
+DATA: GS_LAYOUT  TYPE LVC_S_LAYO,
+      GS_VARIANT TYPE DISVARIANT.
+
+DATA: GV_CONTAINER TYPE SCRFNAME VALUE 'CC_ALV'.
+
+*----------------------------------------------------------------------*
+*       CLASS LCL_ZTREINAMENTO_ALV012 DEFINITION
+*----------------------------------------------------------------------*
+CLASS LCL_ZTREINAMENTO_ALV012 DEFINITION.
+  PUBLIC SECTION.
+
+    METHODS:
+
+      BUSCA_DADOS,
+
+      MONTA_SAIDA_1,
+
+      IMPRIMIR_LIST
+      .
+
+*      CADASTRAR
+
+
+*Private declarations
+    TYPES:  BEGIN OF MTYPE_ZTREINAMENTO_04,
+               NOME   TYPE ZTREINAMENTO_04-CPF,
+               CPF    TYPE ZTREINAMENTO_04-NOME,
+               IDADE  TYPE ZTREINAMENTO_04-IDADE,
+            END OF MTYPE_ZTREINAMENTO_04,
+
+
+           BEGIN OF MTYPE_ZTREINAMENTO_05,
+               CPF      TYPE ZTREINAMENTO_05-CPF,
+               TRABALHO TYPE ZTREINAMENTO_05-TRABALHO,
+               SALARIO  TYPE ZTREINAMENTO_05-SALARIO,
+           END OF MTYPE_ZTREINAMENTO_05.
+
+
+    "Private structures
+    DATA: MS_CELL_STYLE TYPE LVC_S_STYL,
+          MS_ROWS       TYPE LVC_S_ROW.
+
+    "Private tables
+    DATA: MT_ZTREINAMENTO_04   TYPE TABLE OF MTYPE_ZTREINAMENTO_04.
+    DATA: MT_ZTREINAMENTO_05   TYPE TABLE OF MTYPE_ZTREINAMENTO_05.
+
+ENDCLASS.                    "LCL_ZTREINAMENTO_ALV012 DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS CL_ALV DEFINITION
+*----------------------------------------------------------------------*
+CLASS LCL_ALV DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS:
+      CREATE_ALV,
+
+      SET_EVENTS,
+
+      REFRESH.
+
+  PRIVATE SECTION.
+    METHODS:
+      CREATE_OBJECTS,
+
+      DEFINE_LAYOUT,
+
+      CREATE_FIELDCAT,
+
+      EXCLUDE_TB_FUNCTIONS,
+
+      DISPLAY.
+
+    DATA:
+      MT_FIELDCAT TYPE LVC_T_FCAT,
+      MT_EXCLUDE  TYPE UI_FUNCTIONS,
+      MT_ROWS     TYPE LVC_T_ROW,
+      MT_SORT     TYPE LVC_T_SORT.
+
+    DATA:
+      MS_LAYOUT  TYPE LVC_S_LAYO,
+      MS_VARIANT TYPE DISVARIANT.
+
+ENDCLASS.                    "LCL_ALV DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS CL_EVENT_RECEIVER DEFINITION
+*----------------------------------------------------------------------*
+CLASS LCL_EVENT_RECEIVER DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS:
+      HANDLE_TOOLBAR
+                    FOR EVENT TOOLBAR OF CL_GUI_ALV_GRID
+        IMPORTING E_OBJECT E_INTERACTIVE,
+
+      HANDLE_USER_COMMAND
+                    FOR EVENT USER_COMMAND OF CL_GUI_ALV_GRID
+        IMPORTING E_UCOMM,
+
+      HANDLE_DATA_CHANGE_FINISH
+                    FOR EVENT DATA_CHANGED_FINISHED OF CL_GUI_ALV_GRID
+        IMPORTING E_MODIFIED ET_GOOD_CELLS,
+
+      HANDLE_PRINT_TOP_OF_PAGE
+         FOR EVENT PRINT_TOP_OF_PAGE OF CL_GUI_ALV_GRID,
+
+      HANDLE_TOP_OF_PAGE
+         FOR EVENT TOP_OF_PAGE OF CL_GUI_ALV_GRID.
+
+  PROTECTED SECTION.
+
+  PRIVATE SECTION.
+    "Private constants
+    CONSTANTS: BEGIN OF MC_MESSAGE_TYPE,
+                 E TYPE BAPI_MTYPE VALUE 'E', "Erro
+                 I TYPE BAPI_MTYPE VALUE 'I', "Informa��o
+                 S TYPE BAPI_MTYPE VALUE 'S', "Sucesso
+               END OF MC_MESSAGE_TYPE,
+
+               BEGIN OF MC_MESSAGE_ID,
+                 YOWMS TYPE SYMSGID VALUE 'ZNFE',
+               END OF MC_MESSAGE_ID,
+
+               BEGIN OF MC_MESSAGE_NO,
+                 DEFAULT TYPE SYMSGNO VALUE '000',
+               END OF MC_MESSAGE_NO.
+
+    "Private structures
+    DATA: MS_ROWS        TYPE LVC_S_ROW.
+
+ENDCLASS.                    "lcl_event_receiver DEFINITION
