@@ -1,0 +1,25 @@
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_EXIT  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_EXIT INPUT.
+
+    CASE SY-UCOMM.
+    WHEN 'BACK'.
+
+      SET SCREEN 0.
+      LEAVE SCREEN.
+
+    WHEN 'EXIT'.
+
+      LEAVE PROGRAM.
+
+    WHEN 'CANC'.
+
+      SET SCREEN 0.
+      LEAVE SCREEN.
+
+  ENDCASE.
+
+ENDMODULE.
