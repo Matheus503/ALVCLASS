@@ -423,3 +423,21 @@ CLASS LCL_EVENT_RECEIVER IMPLEMENTATION.
   ENDMETHOD. "handle_top_of_page
 
 ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+"Hotspot incluindo interacao com uma transação(Precisa habilitar no fieldcat e os methodos)
+FORM handle_hotspot_click USING e_row_id    TYPE lvc_s_row
+                                e_column_id TYPE lvc_s_col
+                                es_row_no   TYPE lvc_s_roid.
+
+DATA: ls_saida TYPE zzs_alv_nfdoc.
+
+ READ TABLE gt_saida INDEX e_row_id-index TRANSPORTING NO FIELDS.
+
+   CASE e_column_id.
+   	WHEN 'DOCNUM'.
+            READ TABLE gt_saida INTO ls_saida INDEX e_row_id-index.
+            SET PARAMETER ID 'AUN' FIELD ls_saida-docnum.
+            CALL TRANSACTION 'VA03' AND SKIP FIRST SCREEN.
+   ENDCASE.
+
+ENDFORM.
